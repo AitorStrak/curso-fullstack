@@ -40,12 +40,12 @@ const Statistics = ({ good, neutral, bad, all, average, positive }) => {
 };
 
 const App = () => {
-  const [good, setGood] = React.useState(0);
-  const [neutral, setNeutral] = React.useState(0);
-  const [bad, setBad] = React.useState(0);
-  const [all, setAll] = React.useState(0);
-  const [average, setAverage] = React.useState(0);
-  const [positive, setPositive] = React.useState(0);
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+  const [all, setAll] = useState(0);
+  const [average, setAverage] = useState(0);
+  const [positive, setPositive] = useState(0);
 
   const handleSetGood = () => {
     setGood(good + 1);
