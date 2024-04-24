@@ -1,15 +1,47 @@
 import { useState } from 'react'
-import Numbers from './components/numbers';
 
-const Filter = (props) => {
-  console.log(props);
-  // <div>
-  //     Búsqueda de contactos: <input placeholder='Filtrar contactos' value={newFilter} onChange={handleFilter} />
-  // </div>
-};
+const Numbers = ({person}) => (
+  <p>{person.name} {person.number}</p>
+);
 
-const App = ({number}) => {
-  const [persons, setPersons] = useState(number);
+const Filter = ({newFilter, handleFilter}) => (
+  <div>
+      Búsqueda de contactos: <input placeholder='Filtrar contactos' value={newFilter} onChange={handleFilter} />
+  </div>
+);
+
+const PersonForm = ({newName, newNumber, handleNameChange, handleNumberChange, addNumber}) => (
+  <form onSubmit={addNumber}>
+    <h2>Añadir nuevo número</h2>
+    <div>
+      Nombre: <input placeholder='Nombre de contacto' value={newName}  onChange={handleNameChange}/>
+    </div>
+    <div>
+      Número: <input placeholder='Número de teléfono' value={newNumber}  onChange={handleNumberChange}/>
+    </div>
+    <button type="submit">Añadir</button>
+  </form>
+);
+
+const Persons = ({filterName}) => (
+  <>
+    <h2>Contactos</h2>
+      <div>
+        {filterName.map(person => 
+          <Numbers key={person.id} person={person} />
+        )}
+      </div>
+  </>
+);
+
+const App = () => {
+  const [persons, setPersons] = useState([
+      { name: 'Arto Hellas',  number: 646594031, id: 1 },
+      { name: 'Arturo Hell',  number: 123456789, id: 2 },
+      { name: 'Ada Lovelace', number: 39445323523, id: 3 },
+      { name: 'Dan Abramov',  number: 124234345, id: 4 },
+      { name: 'Mary Poppendieck', number: 39236423122, id: 5 }
+  ]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [newFilter, setFilter] = useState('');
@@ -54,28 +86,15 @@ const App = ({number}) => {
   return (
     <>
       <h2>Agenda telefónica</h2>
-      {/* <Filter ... /> */}
-      <div>
-        Búsqueda de contactos: <input placeholder='Filtrar contactos' value={newFilter} onChange={handleFilter} />
-      </div>
-      {/* <PersonForm /> */}
-      <form onSubmit={addNumber}>
-        <h2>Añadir nuevo número</h2>
-        <div>
-          Nombre: <input placeholder='Nombre de contacto' value={newName}  onChange={handleNameChange}/>
-        </div>
-        <div>
-          Número: <input placeholder='Número de teléfono' value={newNumber}  onChange={handleNumberChange}/>
-        </div>
-        <button type="submit">Añadir</button>
-      </form>
-      <h2>Contactos</h2>
-      {/* <Persons ... /> */}
-      <div>
-        {filterName.map(person => 
-          <Numbers key={person.id} person={person} />
-        )}
-      </div>
+      <Filter newFilter={newFilter} handleFilter={handleFilter} />
+      <PersonForm 
+        newName={newName}
+        newNumber={newNumber}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+        addNumber={addNumber}      
+      />
+      <Persons filterName={filterName} />
     </>
   );
 };
