@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import personsService from './services/persons'
 
-const Numbers = ({person}) => (
-  <p>{person.name} {person.number}</p>
+const Numbers = ({person, deleteNumber}) => (
+  <p>
+    {person.name} {person.number}  
+    <button type='submit' onClick={ () => deleteNumber(person.id)} >
+      Borrar
+    </button> 
+  </p> 
 );
 
 const Filter = ({newFilter, handleFilter}) => (
@@ -24,12 +30,12 @@ const PersonForm = ({newName, newNumber, handleNameChange, handleNumberChange, a
   </form>
 );
 
-const Persons = ({filterName}) => (
+const Persons = ({filterName, deleteNumber}) => (
   <>
     <h2>Contactos</h2>
       <div>
         {filterName.map(person => 
-          <Numbers key={person.id} person={person} />
+          <Numbers key={person.id} person={person} deleteNumber={deleteNumber} />
         )}
       </div>
   </>
@@ -42,15 +48,27 @@ const App = () => {
   const [newFilter, setFilter] = useState('');
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled');
-        setPersons(response.data);
-      })
+    personsService
+      .getAll()
+      .then(initialPerson => {
+        setPersons(initialPerson)
+      });
   }, []);
-  console.log('render', persons.length, 'personas');
+  //console.log('render', persons.length, 'personas');
+
+  const deleteNumber = (id) => {
+    const isConfirmed = window.confirm('¿Estás seguro de que quieres borrar este contacto?');
+    if(isConfirmed){
+      personsService
+      .delet(id)
+      .then( () => {
+        setPersons(persons.filter(person => person.id !== id));
+      })
+      .catch(error => {
+        console.log('Error borrando el contacto: ', error);
+      });
+    };
+  };
 
   const addNumber = (e) => {
     e.preventDefault();
@@ -59,18 +77,21 @@ const App = () => {
       number: newNumber,
       id: persons.length + 1,
     };
-    
+  
     const nameAdded = persons.map(person => person.name).includes(newName);
     const numberAdded = persons.map(person => person.number).includes(newNumber);
-    
+
     if(!nameAdded && !numberAdded){
-      setPersons(persons.concat(numberObject));
-      console.log(persons);
-      setNewName('');
-      setNewNumber('');
+      personsService
+        .create(numberObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson));
+          setNewName('');
+          setNewNumber('');
+        });
     }else{
       alert(`${nameAdded ? newName : newNumber} ya está añadido en la agenda`);
-    };
+    };   
   };
 
   const handleNumberChange = (e) => {
@@ -100,7 +121,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
         addNumber={addNumber}      
       />
-      <Persons filterName={filterName} />
+      <Persons filterName={filterName} deleteNumber={deleteNumber} />
     </>
   );
 };
